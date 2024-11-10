@@ -67,14 +67,14 @@ class Client:
                     pre_processing_features=config["pre_processing_features"],
                     classification_algorithm=config["classification_algorithm"]
                 )
-                self.email_classifier.train_model()
+                self.email_classifier.train_model(args.path)
             case "change_strategy":
                 self.email_classifier.change_strategy(args.strategy)
             case "add_preprocessing":
                 self.email_classifier.add_preprocessing(args.feature)
                 print("Preprocessing {args.command} added")
             case "display_evaluation":
-                print("Display Evaluation")
+                self.email_classifier.displayEvaluation()
             case "exit":
                 print("Exiting CLI.")
                 exit(0)
@@ -119,10 +119,8 @@ def create_parser() -> argparse.ArgumentParser:
         'feature', help='Add translation feature.')
 
     # Display Evaluation command
-    display_evaluation_parser = subparsers.add_parser(
+    subparsers.add_parser(
         'display_evaluation', help='Display the evaluation of the current positioning method.')
-    display_evaluation_parser.add_argument(
-        'argument1', help='Name of the positioning method to display the evaluation for.')
 
     # Exit command
     subparsers.add_parser('exit', help='Exit the CLI.')

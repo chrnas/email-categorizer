@@ -6,6 +6,7 @@ from feature_engineering.word2vec import Word2VecEmbeddings
 from feature_engineering.sentence_transformer import SentenceTransformerEmbeddings
 from training_data import TrainingData
 from models.randomforest import RandomForest
+from data_preparation.data_preprocessor_factory import DataPreProcessorFactory
 import pandas as pd
 
 
@@ -32,14 +33,17 @@ class EmailClassifier():
         # load the data
         self.df = self.data_set_loader.read_data(path)
         self.df = self.data_set_loader.renameColumns(self.df)
-
+        processor = DataPreProcessorFactory().create_data_preprocessor( self.df, ["noise_removal", "deduplication"])
+        self.df = processor.process()
         # preproccess the data
+        '''
         processor = DataProcessor(self.df)
         processor = DeDuplicationDecorator(processor)
         processor = TranslatorDecorator(processor)
         processor = NoiseRemovalDecorator(processor)
         processor = UnicodeConversionDecorator(processor)
         self.df = processor.process()
+        '''
 
         # feature engineering
         self.base_embeddings = SentenceTransformerEmbeddings(self.df)

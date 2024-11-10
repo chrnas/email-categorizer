@@ -11,21 +11,21 @@ class EmailClassifierFactory:
 
     @staticmethod
     def create_email_classifier(
+        df: pd.DataFrame,
         embeddings: list[str],
         pre_processing_features: list[str],
-        classification_algorithm: str,
-        df: pd.DataFrame
+        classification_algorithm: str
     ):
         feature_engineer = SimpleEmbeddingsFactory().create_embeddings(
             embeddings, df
         )
         data_processor = DataPreProcessorFactory().create_data_preprocessor(
             df, pre_processing_features)
-        classification_algorithm = ClassificationFactory().create_classification_algorithm(
+        classification_strategy = ClassificationFactory().create_classification_algorithm(
             classification_algorithm)
         email_classifier = EmailClassifierFacade(
             feature_engineer,
             data_processor,
-            classification_algorithm
+            classification_strategy
         )
         return email_classifier
