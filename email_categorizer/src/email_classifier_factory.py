@@ -1,7 +1,10 @@
-from email_classifier import EmailClassifier
+from email_classifier_facade import EmailClassifierFacade
 from data_preparation.data_processor import DataProcessor
+from data_preparation.data_preprocessor_factory import DataPreProcessorFactory
 from feature_engineering.base_embeddings import BaseEmbeddings
 from models.classification_factory import ClassificationFactory
+from feature_engineering.simple_embeddings_factory import SimpleEmbeddingsFactory
+import pandas as pd
 
 
 class EmailClassifierFactory:
@@ -10,13 +13,19 @@ class EmailClassifierFactory:
     def create_email_classifier(
         embeddings: list[str],
         pre_processing_features: list[str],
-        classification_algorithm: str
+        classification_algorithm: str,
+        df: pd.DataFrame
     ):
-        feature_engineer = BaseEmbeddings(embeddings)
-        data_processor = DataProcessor(pre_processing_features)
-        classification_factory = ClassificationFactory()
-        classification_algorithm = classification_factory.create_classification_algorithm(
+        feature_engineer = SimpleEmbeddingsFactory().create_embeddings(
+            embeddings, df
+        )
+        data_processor = DataPreProcessorFactory().create_data_preprocessor(
+            df, pre_processing_features)
+        classification_algorithm = ClassificationFactory().create_classification_algorithm(
             classification_algorithm)
-        email_classifier = EmailClassifier(
-            feature_engineer, data_processor, classification_algorithm)
+        email_classifier = EmailClassifierFacade(
+            feature_engineer,
+            data_processor,
+            classification_algorithm
+        )
         return email_classifier
