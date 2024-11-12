@@ -1,4 +1,4 @@
-from data_preparation.data_processor import *
+from data_preparation.data_processor import DataProcessor
 from data_preparation.dataset_loader import DatasetLoader
 from feature_engineering.base_embeddings import BaseEmbeddings
 from feature_engineering.tfidf import TfidfEmbeddings

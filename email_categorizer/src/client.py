@@ -5,15 +5,24 @@ from prompt_toolkit.history import InMemoryHistory
 from email_classifier_facade import EmailClassifierFacade
 from email_classifier_factory import EmailClassifierFactory
 from data_preparation.dataset_loader import DatasetLoader
+from command import ChangeStrategyCommand, ChooseEmailClassifierCommand, \
+    CommandExecutor, AddEmailsCommand, \
+    CreateEmailClassifierCommand, DisplayEvaluationCommand, ListEmailClassifiersCommand, \
+    AddPreprocessingCommand, TrainModelCommand, ClassifyEmailCommand
 
 
 class Client:
 
-    email_classifier: EmailClassifierFacade
+    email_classifiers: list[EmailClassifierFacade]
     data_set_loader: DatasetLoader
+    command_executor: CommandExecutor
+    active_email_classifier: EmailClassifierFacade
 
     def __init__(self):
         self.data_set_loader = DatasetLoader()
+        self.command_executor = CommandExecutor()
+        self.email_classifiers: list[EmailClassifierFacade] = []
+        self.active_email_classifier: EmailClassifierFacade = None
 
     def print_startup(self):
         print("Startup complete")
@@ -49,18 +58,31 @@ class Client:
                         print(f"{arg}: {getattr(args, arg)}")
                 print("test command executed")
             case "add_emails":
-                print("Add emails")
+                command = AddEmailsCommand(
+                    email_classifier=self.active_email_classifier)
             case "classify_emails":
-                self.email_classifier.classifyEmails()
+                command = ClassifyEmailCommand(
+                    email_classifier=self.active_email_classifier)
+                self.command_executor.execute_command(command)
             case "create_email_classifier":
                 config = {
                     "embeddings": "tfidf",
                     "pre_processing_features": ["noise_removal", "deduplication"],
                     "classification_algorithm": "rainforest"
                 }
-                print(args.path)
-                df = self.data_set_loader.read_data(args.path)
-                df = self.data_set_loader.renameColumns(df)
+                # print(args.path)
+                # df = self.data_set_loader.read_data(args.path)
+                # df = self.data_set_loader.renameColumns(df)
+                command = CreateEmailClassifierCommand(
+                    email_classifiers=self.email_classifiers,
+                    config=config,
+                    path=args.path
+                )
+                self.command_executor.execute_command(command)
+                print(self.email_classifiers)
+                """data_set_loader = DatasetLoader()
+                df = data_set_loader.read_data(args.path)
+                df = data_set_loader.renameColumns(df)
                 self.email_classifier = EmailClassifierFactory().create_email_classifier(
                     df=df,
                     embeddings=config["embeddings"],
@@ -68,13 +90,38 @@ class Client:
                     classification_algorithm=config["classification_algorithm"]
                 )
                 self.email_classifier.train_model(args.path)
+                self.email_classifiers.append(self.email_classifier)"""
+            case "list_email_classifiers":
+                print(self.email_classifiers)
+                command = ListEmailClassifiersCommand(
+                    email_classifiers=self.email_classifiers
+                )
+                print(self.active_email_classifier)
+                self.command_executor.execute_command(command)
+            case "choose_email_classifier":
+                active_email_classifier_ref = [self.active_email_classifier]
+                command = ChooseEmailClassifierCommand(
+                    self.email_classifiers, active_email_classifier_ref, args.name)
+                self.command_executor.execute_command(command)
+                # Unwrap the updated active email classifier
+                self.active_email_classifier = active_email_classifier_ref[0]
             case "change_strategy":
-                self.email_classifier.change_strategy(args.strategy)
+                command = ChangeStrategyCommand(
+                    email_classifier=self.active_email_classifier, strategy=args.strategy)
+                self.command_executor.execute_command(command)
             case "add_preprocessing":
-                self.email_classifier.add_preprocessing(args.feature)
+                command = AddPreprocessingCommand(
+                    email_classifier=self.active_email_classifier, feature=args.feature)
+                self.command_executor.execute_command(command)
                 print("Preprocessing {args.command} added")
+            case "train_model":
+                command = TrainModelCommand(
+                    email_classifier=self.active_email_classifier, path=args.path)
+                self.command_executor.execute_command(command)
             case "display_evaluation":
-                self.email_classifier.displayEvaluation()
+                command = DisplayEvaluationCommand(
+                    email_classifier=self.active_email_classifier)
+                self.command_executor.execute_command(command)
             case "exit":
                 print("Exiting CLI.")
                 exit(0)
@@ -105,6 +152,10 @@ def create_parser() -> argparse.ArgumentParser:
         'create_email_classifier', help='Create an email classifier.')
     create_email_classifier_parser.add_argument(
         'path', help='Path to the email files.')
+     # PosList command
+    choose_email_classifier = subparsers.add_parser(
+        'choose_email_classifier', help='Choose email classifier.')
+    choose_email_classifier.add_argument('name', help='Name to the email classifier.')
 
     # Change Strategy command
     change_strategy_parser = subparsers.add_parser(
@@ -118,9 +169,19 @@ def create_parser() -> argparse.ArgumentParser:
     add_pre_processing_parser.add_argument(
         'feature', help='Add translation feature.')
 
+     # Add preprocessing command
+    train_model = subparsers.add_parser(
+        'train_model', help='Train model.')
+    train_model.add_argument(
+        'path', help='Path for trainng data.')
+
     # Display Evaluation command
     subparsers.add_parser(
         'display_evaluation', help='Display the evaluation of the current positioning method.')
+
+    # List email calssifiers command
+    subparsers.add_parser(
+        'list_email_classifiers', help='List email classifiers.')
 
     # Exit command
     subparsers.add_parser('exit', help='Exit the CLI.')
@@ -135,9 +196,12 @@ def create_completer() -> NestedCompleter:
         'test': None,
         'add_emails': None,
         'classify_emails': None,
-        'create_email_classifier': None,
+        'create_email_classifier': {"../data/AppGallery.csv": None},
+        'list_email_classifiers': None,
+        'choose_email_classifier': None,
         'change_strategy': {'bayes', 'rainforest'},
-        'add_preprocessing': {'deduplication, unicode_conversion, noise_removal'},
+        'add_preprocessing': {'deduplication': None, 'unicode_conversion': None, 'noise_removal':None, 'translation': None},
+        'train_model': {"../data/AppGallery.csv": None},
         'display_evaluation': None,
         'exit': None
     }

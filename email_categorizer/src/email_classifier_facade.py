@@ -12,7 +12,7 @@ from feature_engineering.sentence_transformer import SentenceTransformerEmbeddin
 from data_preparation.data_preprocessor_factory import DataPreProcessorFactory
 from training_data import TrainingData
 from models.randomforest import RandomForest
-
+import random
 
 class EmailClassifierFacade():
     df: pd.DataFrame
@@ -22,6 +22,7 @@ class EmailClassifierFacade():
     classification_strategy: ClassificationStrategy
     data_set_loader: DatasetLoader
     configuration_manager: ConfigurationManager
+    name: str
 
     def __init__(self,
                  base_embeddings: BaseEmbeddings,
@@ -34,6 +35,7 @@ class EmailClassifierFacade():
         self.classification_strategy = classification_strategy
         self.data_set_loader = DatasetLoader()
         self.model = None
+        self.name = str(random.randint(0, 1000000))
 
     def add_emails(self, path):
         self.emails = self.data_set_loader.read_data(path)
@@ -56,11 +58,11 @@ class EmailClassifierFacade():
         # load the data
         #self.df = self.data_preprocessor.process()
         # preproccess the data
-        processor = DataProcessor(self.df)
-        processor = DeDuplicationDecorator(processor)
-        processor = NoiseRemovalDecorator(processor)
-        processor = UnicodeConversionDecorator(processor)
-        self.df = processor.process()
+        #processor = DataProcessor(self.df)
+        #processor = DeDuplicationDecorator(processor)
+        #processor = NoiseRemovalDecorator(processor)
+        #processor = UnicodeConversionDecorator(processor)
+        #self.df = processor.process()
         
         # feature engineering
         self.base_embeddings = SentenceTransformerEmbeddings(self.df)
