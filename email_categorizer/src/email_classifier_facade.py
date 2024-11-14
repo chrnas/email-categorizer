@@ -1,5 +1,5 @@
 from configuration_manager import ConfigurationManager
-from data_preparation.data_processor import (
+from data_preparation.data_processor_flex import (
     DataProcessor, DataProcessorDecorator, DeDuplicationDecorator, 
     TranslatorDecorator, NoiseRemovalDecorator, UnicodeConversionDecorator
 )
@@ -30,7 +30,7 @@ class EmailClassifierFacade():
                  classification_strategy: ClassificationStrategy):
         self.df = None
         self.emails: list[str] = []
-        self.data_preprocessor = data_preprocessor,
+        self.data_preprocessor = DataProcessor(),
         self.base_embeddings = base_embeddings,
         self.classification_strategy = classification_strategy
         self.data_set_loader = DatasetLoader()
@@ -49,14 +49,15 @@ class EmailClassifierFacade():
     def change_strategy(self, strategy: ClassificationStrategy):
         self.classification_strategy.change_strategy(strategy)
 
-    def add_preprocessing(self, pre_processing_feature: DataProcessorDecorator):
-        self.data_preprocessor = pre_processing_feature(self.data_preprocessor)
+    def add_preprocessing(self, data_processor_decorator: DataProcessorDecorator):
+        self.data_preprocessor = data_processor_decorator
 
     def train_model(self, path):
         self.df = self.data_set_loader.read_data(path)
         self.df = self.data_set_loader.renameColumns(self.df)
         # load the data
-        #self.df = self.data_preprocessor.process()
+        print(self.data_preprocessor)
+        self.df = self.data_preprocessor.process(self.df)
         # preproccess the data
         #processor = DataProcessor(self.df)
         #processor = DeDuplicationDecorator(processor)

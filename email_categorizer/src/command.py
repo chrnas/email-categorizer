@@ -124,7 +124,8 @@ class AddPreprocessingCommand(Command):
 
     def execute(self):
         self.pre_processing_feature_decorator = SimpleDataPreProcessorDecoratorFactory().create_data_preprocessor(
-            self.feature)
+            self.email_classifier.data_preprocessor, self.feature)
+        print(f"self pre processing feature: {self.pre_processing_feature_decorator}")  
         self.email_classifier.add_preprocessing(
             self.pre_processing_feature_decorator)
         print(f"Preprocessing {self.feature} added")
@@ -136,6 +137,7 @@ class TrainModelCommand(Command):
         self.path = path
 
     def execute(self):
+        print(self.email_classifier.data_preprocessor)
         self.email_classifier.train_model(self.path)
         print(f"Model trained with data from {self.path}")
 

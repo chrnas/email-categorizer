@@ -1,24 +1,25 @@
 import pandas as pd
-from .data_processor import (
+from .data_processor_flex import (
     NoiseRemovalDecorator,
     TranslatorDecorator,
     DeDuplicationDecorator,
     UnicodeConversionDecorator,
-    DataProcessorDecorator
+    DataProcessorDecorator,
+    DataProcessor
 )
 
 
 class SimpleDataPreProcessorDecoratorFactory:
     @staticmethod
-    def create_data_preprocessor(feature: str) -> DataProcessorDecorator:
+    def create_data_preprocessor(processor: DataProcessor, feature: str) -> DataProcessorDecorator:
 
         if feature == "noise_removal":
-            return NoiseRemovalDecorator
+            return NoiseRemovalDecorator(processor)
         elif feature == "translation":
-            return TranslatorDecorator
+            return TranslatorDecorator(processor)
         elif feature == "deduplication":
-            return DeDuplicationDecorator
+            return DeDuplicationDecorator(processor)
         elif feature == "unicode_conversion":
-            return UnicodeConversionDecorator
+            return UnicodeConversionDecorator(processor)
         else:
             raise ValueError(f"Unknown feature type: {feature}")

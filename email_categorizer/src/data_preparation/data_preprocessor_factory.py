@@ -1,5 +1,5 @@
 import pandas as pd
-from .data_processor import (
+from .data_processor_flex import (
     DataProcessor,
     NoiseRemovalDecorator,
     TranslatorDecorator,
@@ -10,9 +10,9 @@ from .data_processor import (
 
 class DataPreProcessorFactory:
     @staticmethod
-    def create_data_preprocessor(df: pd.DataFrame, pre_processing_features: list[str]):
+    def create_data_preprocessor(pre_processing_features: list[str]):
 
-        data_preprocessor = DataProcessor(df)
+        data_preprocessor = DataProcessor()
         for feature in pre_processing_features:
             if feature == "noise_removal":
                 data_preprocessor = NoiseRemovalDecorator(data_preprocessor)

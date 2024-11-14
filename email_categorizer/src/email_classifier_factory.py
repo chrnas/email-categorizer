@@ -1,5 +1,5 @@
 from email_classifier_facade import EmailClassifierFacade
-from data_preparation.data_processor import DataProcessor, DataProcessorBase
+from data_preparation.data_processor_flex import DataProcessor
 from data_preparation.data_preprocessor_factory import DataPreProcessorFactory
 from feature_engineering.base_embeddings import BaseEmbeddings
 from models.classification_factory import ClassificationFactory
@@ -19,9 +19,9 @@ class EmailClassifierFactory:
         feature_engineer = SimpleEmbeddingsFactory().create_embeddings(
             embeddings, df
         )
-        #data_processor = DataPreProcessorFactory().create_data_preprocessor(
+        # data_processor = DataPreProcessorFactory().create_data_preprocessor(
         #    df, pre_processing_features)
-        data_processor = DataProcessorBase(df)
+        data_processor = DataProcessor()
         classification_strategy = ClassificationFactory().create_classification_algorithm(
             classification_algorithm)
         email_classifier = EmailClassifierFacade(
