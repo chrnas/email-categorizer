@@ -32,7 +32,7 @@ class EmailClassifier():
         classification = self.model.use_model(email)
         print("Email classified")
         return classification
-
+    def predict_text(self,config):
     def train_model(self, path: str) -> None:
         # load the data
         self.df = self.data_set_loader.read_data(path)
@@ -63,7 +63,8 @@ class EmailClassifier():
         context.predict()
         self.context = context
         #self.model.predict(self.data)
-
+    
 
     def printModelEvaluation(self):
         self.context.print_results()
+       
