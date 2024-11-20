@@ -35,7 +35,10 @@ class BaseModel(ABC):
         return self
 
     def predict_emails(self, emails_to_predict):
-        predictions = self.mdl.predict(emails_to_predict)
+        predictions = []
+        for email in emails_to_predict:
+            prediction = self.mdl.predict(email)
+            self.results.append((prediction, email))
         return predictions
         """print(predictions)
         index = 0
