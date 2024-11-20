@@ -7,7 +7,8 @@ from context_classification.context import ContextClassifier
 from data_preparation.data_processor import DataProcessor
 from training_data import TrainingData
 from models.model_factory import ModelFactory
-
+from observing.result_displayer import ResultDisplayer
+from observing.statistics_collector import StatCollector
 
 
 class EmailClassifierFacade():
@@ -33,6 +34,11 @@ class EmailClassifierFacade():
         self.name = name
         self.df = None
         self.emails: pd.DataFrame = None
+
+        result_displayer = ResultDisplayer()
+        self.model_context.subscribe(result_displayer)
+        stat_collector = StatCollector
+        self.model_context.subscribe(stat_collector)
 
     def __eq__(self, other):
         # Define equality based on name and age
