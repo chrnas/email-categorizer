@@ -50,14 +50,16 @@ class AddEmailsCommand(Command):
     def __init__(self, email_classifier: EmailClassifierFacade, path: str):
         self.email_classifier = email_classifier
         self.path = path
+        self.old_emails = email_classifier.emails
 
     def execute(self):
         path = "../data/"+str(self.path)
         self.email_classifier.add_emails(path)
         print(f'Added emails to email classifier:{self.email_classifier.name}')
 
-    def undo():
-        print("There is no undo operation for the add emails command.")
+    def undo(self):
+        self.email_classifier.emails = self.old_emails
+        print("Previous emails have been restored.")
 
 
 class CreateEmailClassifierCommand(Command):
@@ -67,6 +69,7 @@ class CreateEmailClassifierCommand(Command):
         path: str,
         embedding: str,
         model: str,
+        preprocessing_features: list[str],
         name: str,
     ):
         self.email_classifiers = email_classifiers
@@ -74,6 +77,7 @@ class CreateEmailClassifierCommand(Command):
         self.embedding = embedding
         self.model = model
         self.name = name
+        self.pre_processing_features = preprocessing_features
         self.created_email_classifier = None
 
     def execute(self):
@@ -86,6 +90,7 @@ class CreateEmailClassifierCommand(Command):
             df,
             self.embedding,
             self.model,
+            self.pre_processing_features,
             self.name
         )
         self.email_classifiers.append(self.email_classifier)

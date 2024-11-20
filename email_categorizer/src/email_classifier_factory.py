@@ -1,12 +1,11 @@
 from context_classification.context import ContextClassifier
-from data_preparation.dataset_loader import DatasetLoader
 from email_classifier_facade import EmailClassifierFacade
 from data_preparation.data_processor import DataProcessor
-from feature_engineering.base_embeddings import BaseEmbeddings
 from models.model_factory import ModelFactory
 from feature_engineering.embeddings_factory import EmbeddingsFactory
 import pandas as pd
 from training_data import TrainingData
+from data_preparation.simple_data_preprocessor_decorator_factory import SimpleDataPreProcessorDecoratorFactory
 
 
 class EmailClassifierFactory:
@@ -16,11 +15,13 @@ class EmailClassifierFactory:
         df: pd.DataFrame,
         embedding_type: str,
         model_type: str,
+        pre_processing_features: list[str],
         name: str
     ):
-        # data_processor = DataPreProcessorFactory().create_data_preprocessor(
-        #    df, pre_processing_features)
         data_processor = DataProcessor()
+        for feature in pre_processing_features:
+            data_processor = SimpleDataPreProcessorDecoratorFactory().create_data_preprocessor(
+                data_processor, feature)
         df = data_processor.process(df)
         feature_engineer = EmbeddingsFactory().create_embeddings(
             embedding_type, df

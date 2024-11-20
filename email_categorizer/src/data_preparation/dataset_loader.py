@@ -1,4 +1,5 @@
 import pandas as pd
+from classifier_config_singleton import ClassifierConfigSingleton
 
 
 class DatasetLoader():

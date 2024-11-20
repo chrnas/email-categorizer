@@ -11,6 +11,7 @@ from command import ChangeStrategyCommand, ChooseEmailClassifierCommand, \
     ListEmailClassifiersCommand, AddPreprocessingCommand, \
     TrainModelCommand, ClassifyEmailCommand
 from email_classifier_factory import EmailClassifierFactory
+from classifier_config_singleton import ClassifierConfigSingleton
 
 
 class Client:
@@ -18,10 +19,12 @@ class Client:
     email_classifiers: list[EmailClassifierFacade]
     data_set_loader: DatasetLoader
     command_invoker: CommandInvoker
+    config_manager: ClassifierConfigSingleton
 
     def __init__(self):
         self.data_set_loader = DatasetLoader()
         self.command_invoker = CommandInvoker()
+        self.config_manager = ClassifierConfigSingleton()
         self.email_classifiers: list[EmailClassifierFacade] = []
 
     def create_parser(self) -> argparse.ArgumentParser:
@@ -43,12 +46,9 @@ class Client:
         create_email_classifier_parser = subparsers.add_parser(
             'create_email_classifier', help='Create an email classifier.')
         create_email_classifier_parser.add_argument(
-            'path', help='Path to the email files.')
+            'path', help='Path to the email files for training.')
         create_email_classifier_parser.add_argument(
-            'embedding', help='Embeddings type.')
-        create_email_classifier_parser.add_argument(
-            'model', help='Classification algorithm.')
-        create_email_classifier_parser.add_argument('name', help='Name to the email classifier.')
+            'name', help='Name for the email classifier.')
 
         # Choose email classifier command
         choose_email_classifier = subparsers.add_parser(
@@ -88,15 +88,16 @@ class Client:
     def create_completer(self) -> NestedCompleter:
 
         # Extract method names and their possible settings
-        features_dict = ['deduplication', 'unicode_conversion', 'noise_removal', 'translation']
-        model_dict = ['bayes', 'randomforest', 'svc']
-        embeddings_dict = ['tfidf', 'wordcount', 'sentence_transformer']
+        features_dict = self.config_manager.preprocessing_features
+        model_dict = self.config_manager.models
+        embeddings_dict = self.config_manager.embeddings
         completer_dict = {
-            'create_email_classifier AppGallery.csv tfidf randomforest emailclassifiertest': None,
+            # 'create_email_classifier AppGallery.csv tfidf randomforest emailclassifiertest': None,
             'test': {emailclassifier.name: None for emailclassifier in self.email_classifiers},
             'add_emails': {paths: None for paths in os.listdir("../data")},
             'classify_emails': None,
-            'create_email_classifier': {paths: {embedding: {model: None for model in model_dict} for embedding in embeddings_dict} for paths in os.listdir("../data")},
+            # 'create_email_classifier': {paths: {embedding: {model: None for model in model_dict} for embedding in embeddings_dict} for paths in os.listdir("../data")},
+            'create_email_classifier': {path: None for path in os.listdir("../data")},
             'list_email_classifiers': {email_classifier.name: None for email_classifier in self.email_classifiers},
             'choose_email_classifier': None,
             'change_strategy': {model: None for model in model_dict},
@@ -119,7 +120,7 @@ class Client:
 
         while True:
             completer = self.create_completer()
-            try:            
+            try:         
                 input_str = prompt("> ", completer=completer, history=history)
                 if input_str.strip().lower() == 'exit':
                     print("Exiting CLI.")
@@ -145,8 +146,12 @@ class Client:
                 command = CreateEmailClassifierCommand(
                     email_classifiers=self.email_classifiers,
                     path=args.path,
-                    embedding=args.embedding,
-                    model=args.model,
+                    embedding=self.config_manager.default_classifier_config[
+                        'embedding'],
+                    model=self.config_manager.default_classifier_config[
+                        'model'],
+                    preprocessing_features=self.config_manager.default_classifier_config[
+                        'preprocessing'],
                     name=args.name
                 )
                 self.command_invoker.set_command(command)
