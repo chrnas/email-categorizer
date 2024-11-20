@@ -1,7 +1,11 @@
 from context_classification.context import ContextClassifier
+from abc import ABC, abstractmethod
 
-class Observer:
+class Observer(ABC):
     
-    def update(context: ContextClassifier):
-        # collect the values 
-        context.print_results()
+    @abstractmethod
+    def update(self, context: ContextClassifier):
+        """
+        Receive update from subject.
+        """ 
+        ...
