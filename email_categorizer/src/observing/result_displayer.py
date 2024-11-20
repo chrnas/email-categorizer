@@ -7,10 +7,10 @@ class ResultDisplayer(Observer):
     def __init__(self):
         self.results = []
 
-    def update(self, context: ContextClassifier, emails: DataFrame):
-        # Get predictions from the context
-        predictions = context.predict_emails()
-
+    def update(self, event_type, predictions: list, emails: DataFrame):
+        if event_type != 'predicting':
+            return  # Ignore irrelevant events
+        # Handle relevant event
         # Ensure predictions and emails have the same length
         if len(predictions) != len(emails):
             raise ValueError("The number of predictions does not match the number of emails.")

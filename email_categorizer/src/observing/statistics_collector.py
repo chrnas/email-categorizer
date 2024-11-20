@@ -6,9 +6,11 @@ class StatCollector(Observer):
     def __init__(self):
         self.statistics = None
 
-    def update(self, context: ContextClassifier):
+    def update(self, event_type, statistics):
+        if event_type != 'evaluating':
+            return  # Ignore irrelevant events
+        # Handle relevant event
         # Get statistics from the context
-        statistics = context.print_results()
         self.statistics = statistics
         self.display()
 
