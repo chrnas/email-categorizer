@@ -1,4 +1,7 @@
+from context_classification.context import ContextClassifier
 
 class Observer:
-    def observe():
-        pass
+    
+    def update(context: ContextClassifier):
+        # collect the values 
+        context.print_results()
