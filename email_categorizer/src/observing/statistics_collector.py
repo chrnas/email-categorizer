@@ -1,9 +1,9 @@
-from .base import BaseModel
+from models.base import BaseModel
 from .observe import Observer
 from context_classification.context import ContextClassifier
 
-class StatCollector (Observer):
+class StatCollector(Observer):
     
-    def update(context: ContextClassifer):
+    def update(self, context: ContextClassifier):
         context.print_results()
         
