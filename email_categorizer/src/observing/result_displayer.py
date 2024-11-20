@@ -19,6 +19,8 @@ class ResultDisplayer(Observer):
         for email, prediction in zip(emails.itertuples(index=False), predictions):
             self.results.append((prediction, email.content))  # Adjusted order for clarity
 
+        self.display()
+
     def display(self):
         # Print collected results
         for prediction, email_content in self.results:

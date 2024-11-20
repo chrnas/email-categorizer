@@ -8,6 +8,23 @@ class ContextClassifier():
     def __init__(self, data: TrainingData) -> None:
         self.modelstrat = None
         self.data = data
+        self._observers = []
+
+    # Observer management methods
+    def subscribe(self, observer):
+        """Add an observer to the list."""
+        if observer not in self._observers:
+            self._observers.append(observer)
+
+    def unsubscribe(self, observer):
+        """Remove an observer from the list."""
+        if observer in self._observers:
+            self._observers.remove(observer)
+
+    def notify(self, data):
+        """Notify all observers of an event."""
+        for observer in self._observers:
+            observer.update(self, data)
 
     def choose_strat(self, modelstrat: BaseModel):
         self.modelstrat = modelstrat
@@ -18,6 +35,9 @@ class ContextClassifier():
     def predict(self):
         self.modelstrat.predict(self.data)
 
+    def classification_report(self) : 
+        self.modelstrat.classification_report(self.data)
+        
     def print_results(self):
         self.modelstrat.print_results(self.data)
 

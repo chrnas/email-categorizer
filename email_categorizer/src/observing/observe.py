@@ -9,3 +9,6 @@ class Observer(ABC):
         Receive update from subject.
         """ 
         ...
+
+    def display(self):
+        ...
