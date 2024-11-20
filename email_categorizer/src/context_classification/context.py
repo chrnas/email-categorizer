@@ -36,12 +36,13 @@ class ContextClassifier():
         self.modelstrat.predict(self.data)
 
     def classification_report(self) : 
-        self.modelstrat.classification_report(self.data)
+        report = self.modelstrat.classification_report(self.data)
+        self.notify("evaluating", report)
         
     def print_results(self):
         self.modelstrat.print_results(self.data)
 
     def predict_emails(self, emails_to_predict):
         predictions = self.modelstrat.predict_emails(emails_to_predict)
-        self.notify(predictions, emails_to_predict)
+        self.notify("predicting", predictions)
         

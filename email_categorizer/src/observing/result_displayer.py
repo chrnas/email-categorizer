@@ -5,23 +5,16 @@ from pandas import DataFrame
 class ResultDisplayer(Observer):
     
     def __init__(self):
-        self.results = []
+        self.predictions = []
 
-    def update(self, event_type, predictions: list, emails: DataFrame):
+    def update(self, event_type, predictions):
         if event_type != 'predicting':
             return  # Ignore irrelevant events
         # Handle relevant event
-        # Ensure predictions and emails have the same length
-        if len(predictions) != len(emails):
-            raise ValueError("The number of predictions does not match the number of emails.")
-
-        # Collect predictions along with corresponding email content
-        for email, prediction in zip(emails.itertuples(index=False), predictions):
-            self.results.append((prediction, email.content))  # Adjusted order for clarity
-
+        self.predictions = predictions
         self.display()
 
     def display(self):
         # Print collected results
-        for prediction, email_content in self.results:
+        for prediction, email_content in self.predictions:
             print(f"Prediction: {prediction} | Email: {email_content}")
