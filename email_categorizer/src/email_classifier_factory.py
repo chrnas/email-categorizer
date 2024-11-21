@@ -37,7 +37,7 @@ class EmailClassifierFactory:
             model_type, data.X_test, data.y)
         strategy_context = ContextClassifier(data)
 
-        stat_collector = StatCollector
+        stat_collector = StatCollector()
         strategy_context.subscribe(stat_collector)
         result_displayer = ResultDisplayer()
         strategy_context.subscribe(result_displayer)

@@ -15,7 +15,7 @@ class BaseModel(ABC):
         self.predictions = predictions
 
     def classification_report(self, data) : 
-        report = classification_report(data.get_y_test(), self.predictions)
+        report = classification_report(data.get_y_test(), self.predictions, output_dict=True)
         return report
 
     def print_results(self, data):
