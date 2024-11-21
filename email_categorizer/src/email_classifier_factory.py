@@ -6,6 +6,8 @@ from feature_engineering.embeddings_factory import EmbeddingsFactory
 import pandas as pd
 from training_data import TrainingData
 from data_preparation.simple_data_preprocessor_decorator_factory import SimpleDataPreProcessorDecoratorFactory
+from observing.result_displayer import ResultDisplayer
+from observing.statistics_collector import StatCollector
 
 
 class EmailClassifierFactory:
@@ -18,6 +20,9 @@ class EmailClassifierFactory:
         pre_processing_features: list[str],
         name: str
     ):
+
+        # data_processor = DataPreProcessorFactory().create_data_preprocessor(
+        #    df, pre_processing_features)
         data_processor = DataProcessor()
         for feature in pre_processing_features:
             data_processor = SimpleDataPreProcessorDecoratorFactory().create_data_preprocessor(
@@ -31,10 +36,18 @@ class EmailClassifierFactory:
         model = ModelFactory().create_model(
             model_type, data.X_test, data.y)
         strategy_context = ContextClassifier(data)
+
+        stat_collector = StatCollector
+        strategy_context.subscribe(stat_collector)
+        result_displayer = ResultDisplayer()
+        strategy_context.subscribe(result_displayer)
+
         strategy_context.choose_strat(model)
         strategy_context.train()
         strategy_context.predict()
         strategy_context.print_results()
+        print("printing classification in facade")
+        strategy_context.classification_report()
         email_classifier = EmailClassifierFacade(
             feature_engineer,
             data_processor,

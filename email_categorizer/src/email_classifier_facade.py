@@ -34,11 +34,11 @@ class EmailClassifierFacade():
         self.name = name
         self.df = None
         self.emails: pd.DataFrame = None
-
+        """
         result_displayer = ResultDisplayer()
         self.model_context.subscribe(result_displayer)
         stat_collector = StatCollector
-        self.model_context.subscribe(stat_collector)
+        self.model_context.subscribe(stat_collector) """
 
     def __eq__(self, other):
         # Define equality based on name and age
@@ -56,6 +56,7 @@ class EmailClassifierFacade():
         df = self.data_preprocessor.process(self.emails)
         X = self.base_embeddings.create_classification_embeddings(df)
         self.model_context.predict_emails(X)
+        
 
     def change_strategy(self, model_type: str):
         model = ModelFactory().create_model(
@@ -85,12 +86,17 @@ class EmailClassifierFacade():
         # modelling
         self.data = TrainingData(X, self.df)
         #use model name here or something similar
+        print("train")
         model = ModelFactory().create_model(
             "randomforest", self.data.get_X_test(), self.data.get_type())
         self.model_context.choose_strat(model)
         self.model_context.train()
         self.model_context.predict()
+        print("pritrnting results in facade")
         self.model_context.print_results()
+        print("printing classification in facade")
+        self.model_context.classification_report()
 
     def display_evaluation(self):
         self.model_context.print_results()
+    

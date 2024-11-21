@@ -13,6 +13,7 @@ class ContextClassifier():
     # Observer management methods
     def subscribe(self, observer):
         """Add an observer to the list."""
+        print("subscribing")
         if observer not in self._observers:
             self._observers.append(observer)
 
@@ -21,10 +22,12 @@ class ContextClassifier():
         if observer in self._observers:
             self._observers.remove(observer)
 
-    def notify(self, data):
+    def notify(self, event_type, smth):
         """Notify all observers of an event."""
+        print("notify")
         for observer in self._observers:
-            observer.update(self, data)
+            print("times")
+            observer.update(event_type, smth)
 
     def choose_strat(self, modelstrat: BaseModel):
         self.modelstrat = modelstrat
@@ -36,13 +39,16 @@ class ContextClassifier():
         self.modelstrat.predict(self.data)
 
     def classification_report(self) : 
+        print("reporting  in context")
         report = self.modelstrat.classification_report(self.data)
+        
         self.notify("evaluating", report)
         
     def print_results(self):
         self.modelstrat.print_results(self.data)
 
     def predict_emails(self, emails_to_predict):
+        print("predicting emails in context")
         predictions = self.modelstrat.predict_emails(emails_to_predict)
         self.notify("predicting", predictions)
         

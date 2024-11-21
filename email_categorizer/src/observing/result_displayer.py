@@ -8,6 +8,7 @@ class ResultDisplayer(Observer):
         self.predictions = []
 
     def update(self, event_type, predictions):
+        print("update results ")
         if event_type != 'predicting':
             return  # Ignore irrelevant events
         # Handle relevant event

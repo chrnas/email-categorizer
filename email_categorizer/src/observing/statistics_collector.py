@@ -7,9 +7,11 @@ class StatCollector(Observer):
         self.statistics = None
 
     def update(self, event_type, statistics):
+        print("update stat2")
         if event_type != 'evaluating':
-            return  # Ignore irrelevant events
+            return  # Ignore irrelevant eventspython
         # Handle relevant event
+        print("update stat")
         self.statistics = statistics
         self.display()
 
